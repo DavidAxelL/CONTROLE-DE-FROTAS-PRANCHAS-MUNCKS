@@ -14,6 +14,56 @@
             --destaque-laranja: #ff7d00;
             --laranja-claro: #ff9a3c;
             --texto-branco: #e6f1ff;
+        }
+        body { background-color: var(--fundo-principal); color: var(--texto-branco); min-height: 100vh; }
+        .hidden { display: none !important; }
+        .btn { background-color: var(--destaque-laranja); color: #000; font-weight: bold; padding: 10px 15px; border-radius: 6px; border: none; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background-color: var(--laranja-claro); }
+        .input { background-color: var(--fundo-principal); border: 1px solid #445577; padding: 10px; border-radius: 6px; color: white; width: 100%; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== TELA DE LOGIN (NÃO MUDOU NADA) ==================== -->
+<div id="tela-login" class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-md p-8 rounded-xl bg-[#112240] border border-[#ff7d00] shadow-2xl">
+        <h1 class="text-3xl font-bold text-center mb-8 text-[#ff7d00]">COA - ACESSO</h1>
+        <input type="text" id="usuario" class="input" placeholder="Usuário">
+        <input type="password" id="senha" class="input" placeholder="Senha">
+        <button onclick="fazerLogin()" class="btn w-full text-lg mt-4">ENTRAR</button>
+    </div>
+</div>
+
+<!-- ==================== ÁREA DE GERENCIAR USUÁRIOS (ADICIONADA AQUI) ==================== -->
+<div id="painel-usuarios" class="hidden p-4 bg-[#112240] rounded-lg border border-[#ff7d00] mx-4 mt-4">
+    <h3 class="text-xl font-bold text-[#ff7d00] mb-4">GERENCIAR USUÁRIOS</h3>
+    <div class="grid gap-3 mb-4">
+        <input type="text" id="nome-usuario" placeholder="Nome completo" class="input">
+        <input type="text" id="login-novo" placeholder="Usuário de acesso" class="input">
+        <input type="password" id="senha-nova" placeholder="Senha" class="input">
+        <button onclick="cadastrarUsuario()" class="btn">CADASTRAR NOVO USUÁRIO</button>
+    </div>
+    <div id="lista-usuarios" class="mt-4"></div>
+</div>
+
+<!-- ==================== SEU SISTEMA PRINCIPAL (COLOQUE TODO O RESTO DO SEU CÓDIGO AQUI DENTRO) ==================== -->
+<div id="sistema-principal" class="hidden p-4">
+    <!-- <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COA - Sistema de Agendamentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; }
+        :root {
+            --fundo-principal: #0a192f;
+            --fundo-card: #112240;
+            --destaque-laranja: #ff7d00;
+            --laranja-claro: #ff9a3c;
+            --texto-branco: #e6f1ff;
             --texto-cinza: #a8b2d1;
             --borda-suave: #233554;
             --status-pendente: #facc15;
@@ -314,6 +364,71 @@
         </div>
         <button class="btn btn-principal w-full" onclick="fazerLogin()">Entrar no Sistema</button>
     </div>
+<!-- ÁREA DE GERENCIAMENTO DE USUÁRIOS -->
+<div id="painel-usuarios" class="hidden mt-6 p-4 bg-[#112240] rounded-lg border border-[#ff7d00]">
+    <h3 class="text-xl font-bold text-[#ff7d00] mb-4">GERENCIAR USUÁRIOS</h3>
+    <div class="grid gap-3 mb-4">
+        <input type="text" id="nome-usuario" placeholder="Nome completo" class="p-2 rounded bg-[#0a192f] text-white border border-gray-600">
+        <input type="text" id="login-novo" placeholder="Usuário de acesso" class="p-2 rounded bg-[#0a192f] text-white border border-gray-600">
+        <input type="password" id="senha-nova" placeholder="Senha" class="p-2 rounded bg-[#0a192f] text-white border border-gray-600">
+        <button onclick="cadastrarUsuario()" class="bg-[#ff7d00] hover:bg-[#ff9a3c] text-black font-bold p-2 rounded transition">CADASTRAR NOVO USUÁRIO</button>
+    </div>
+    <div id="lista-usuarios" class="mt-4"></div>
+</div>
+
+<script>
+// Dados iniciais (seu acesso principal)
+let listaUsuarios = JSON.parse(localStorage.getItem('usuariosSistema')) || [
+    { nome: "Administrador", usuario: "COA", senha: "123456789" }
+];
+
+// Salva automaticamente os usuários
+function salvarUsuarios() {
+    localStorage.setItem('usuariosSistema', JSON.stringify(listaUsuarios));
+    atualizarLista();
+}
+
+// Cadastra novo usuário
+function cadastrarUsuario() {
+    const nome = document.getElementById('nome-usuario').value.trim();
+    const login = document.getElementById('login-novo').value.trim();
+    const senha = document.getElementById('senha-nova').value.trim();
+
+    if(!nome || !login || !senha) { alert('Preencha todos os campos!'); return; }
+    if(listaUsuarios.find(u => u.usuario === login)) { alert('Esse usuário já existe!'); return; }
+
+    listaUsuarios.push({ nome, usuario: login, senha });
+    salvarUsuarios();
+    alert('Usuário cadastrado com sucesso!');
+    document.getElementById('nome-usuario').value = '';
+    document.getElementById('login-novo').value = '';
+    document.getElementById('senha-nova').value = '';
+}
+
+// Atualiza a lista na tela
+function atualizarLista() {
+    const area = document.getElementById('lista-usuarios');
+    area.innerHTML = `<p class="text-white mb-2">Total de usuários cadastrados: ${listaUsuarios.length}</p>`;
+    listaUsuarios.forEach((u, indice) => {
+        area.innerHTML += `
+        <div class="flex justify-between items-center p-2 mb-2 bg-[#0a192f] rounded text-white">
+            <span>${u.nome} | Usuário: ${u.usuario}</span>
+            <button onclick="excluirUsuario(${indice})" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white">EXCLUIR</button>
+        </div>`;
+    });
+}
+
+// Exclui usuário
+function excluirUsuario(indice) {
+    if(confirm('Tem certeza que deseja excluir esse usuário?')) {
+        listaUsuarios.splice(indice, 1);
+        salvarUsuarios();
+    }
+}
+
+// Carrega a lista ao abrir o sistema
+atualizarLista();
+</script>
 </div>
  
 <!-- Tela Principal -->
@@ -683,18 +798,22 @@ let graficoStatus = null;
  
 // Login
 function fazerLogin() {
-    const usuario = document.getElementById('usuario').value;
-    const senha = document.getElementById('senha').value;
-    if (usuario && senha) {
-        document.getElementById('telaLogin').style.display = 'none';
-        document.getElementById('telaPrincipal').style.display = 'flex';
-        atualizarTela();
-        inicializarGrafico();
+    const user = document.getElementById('usuario').value.trim();
+    const pass = document.getElementById('senha').value.trim();
+
+    const listaUsuarios = JSON.parse(localStorage.getItem('usuariosSistema')) || [
+        { nome: "Administrador", usuario: "COA", senha: "123456789" }
+    ];
+
+    const encontrado = listaUsuarios.find(u => u.usuario === user && u.senha === pass);
+    if(encontrado) {
+        alert(`Bem-vindo, ${encontrado.nome}!`);
+        document.getElementById('tela-login').classList.add('hidden');
+        document.getElementById('sistema-principal').classList.remove('hidden');
     } else {
-        alert('Preencha usuário e senha para continuar!');
+        alert('Usuário ou senha incorretos!');
     }
-}
- 
+} 
 function sair() {
     document.getElementById('telaLogin').style.display = 'flex';
     document.getElementById('telaPrincipal').style.display = 'none';
@@ -1253,5 +1372,76 @@ function atualizarControleFrotas() {
 }
 
 </script>
+</body>
+</html>
+</div>
+
+<script>
+// ==================== SISTEMA DE USUÁRIOS ====================
+let listaUsuarios = JSON.parse(localStorage.getItem('usuariosSistema')) || [
+    { nome: "Administrador", usuario: "COA", senha: "123456789" }
+];
+
+function salvarUsuarios() {
+    localStorage.setItem('usuariosSistema', JSON.stringify(listaUsuarios));
+    atualizarLista();
+}
+
+function cadastrarUsuario() {
+    const nome = document.getElementById('nome-usuario').value.trim();
+    const login = document.getElementById('login-novo').value.trim();
+    const senha = document.getElementById('senha-nova').value.trim();
+
+    if(!nome || !login || !senha) { alert('Preencha todos os campos!'); return; }
+    if(listaUsuarios.find(u => u.usuario === login)) { alert('Esse usuário já existe!'); return; }
+
+    listaUsuarios.push({ nome, usuario: login, senha });
+    salvarUsuarios();
+    alert('Usuário cadastrado com sucesso!');
+    document.getElementById('nome-usuario').value = '';
+    document.getElementById('login-novo').value = '';
+    document.getElementById('senha-nova').value = '';
+}
+
+function atualizarLista() {
+    const area = document.getElementById('lista-usuarios');
+    area.innerHTML = `<p class="text-white mb-2">Total de usuários: ${listaUsuarios.length}</p>`;
+    listaUsuarios.forEach((u, indice) => {
+        area.innerHTML += `
+        <div class="flex justify-between items-center p-2 mb-2 bg-[#0a192f] rounded text-white">
+            <span>${u.nome} | Usuário: ${u.usuario}</span>
+            <button onclick="excluirUsuario(${indice})" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white">EXCLUIR</button>
+        </div>`;
+    });
+}
+
+function excluirUsuario(indice) {
+    if(confirm('Tem certeza que deseja excluir esse usuário?')) {
+        listaUsuarios.splice(indice, 1);
+        salvarUsuarios();
+    }
+}
+
+// ==================== FUNÇÃO DE LOGIN ATUALIZADA ====================
+function fazerLogin() {
+    const user = document.getElementById('usuario').value.trim();
+    const pass = document.getElementById('senha').value.trim();
+
+    const usuarioEncontrado = listaUsuarios.find(u => u.usuario === user && u.senha === pass);
+    if(usuarioEncontrado) {
+        alert(`Bem-vindo, ${usuarioEncontrado.nome}!`);
+        document.getElementById('tela-login').classList.add('hidden');
+        document.getElementById('sistema-principal').classList.remove('hidden');
+        // Mostra o painel de usuários só para o admin
+        if(user === "COA") document.getElementById('painel-usuarios').classList.remove('hidden');
+    } else {
+        alert('Usuário ou senha incorretos!');
+    }
+}
+
+// Carrega lista ao abrir
+atualizarLista();
+</script>
+
 </body>
 </html>
